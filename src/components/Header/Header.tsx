@@ -2,6 +2,7 @@ import { FC } from "react";
 import { AppBar, Toolbar, AppBarProps, Box } from "@mui/material";
 import { IconButton, Typography } from "@mui/material/";
 import MenuIcon from "@mui/icons-material/Menu";
+import LogoutIcon from "@mui/icons-material/Logout";
 
 export interface HeaderProps extends AppBarProps {
   onDrawerToggle: () => void;
@@ -12,6 +13,10 @@ export const Header: FC<HeaderProps> = ({
   text,
   ...appBarProps
 }) => {
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    window.location.reload();
+  };
   return (
     <AppBar
       position="fixed"
@@ -47,6 +52,14 @@ export const Header: FC<HeaderProps> = ({
             {text}
           </Typography>
         </Box>
+        <IconButton
+          color="inherit"
+          aria-label="logut"
+          edge="end"
+          onClick={handleLogout}
+        >
+          <LogoutIcon />
+        </IconButton>
       </Toolbar>
     </AppBar>
   );

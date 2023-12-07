@@ -6,14 +6,13 @@ import type {
 } from "axios";
 import type { BaseQueryFn } from "@reduxjs/toolkit/query";
 export const axiosInstance = axios.create({
-  withCredentials: true,
   baseURL: process.env.REACT_APP_API_URL,
 });
 
 const useBearerHeader = (config: InternalAxiosRequestConfig) => {
-  config.headers.Authorization = `Bearer ${window.localStorage.getItem(
-    "token"
-  )}`;
+  config.headers.Authorization =
+    window.localStorage.getItem("token") &&
+    `Token ${window.localStorage.getItem("token")}`;
   return config;
 };
 // const useRefreshToken = async (error: any) => {

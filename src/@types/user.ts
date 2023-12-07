@@ -20,16 +20,15 @@ export interface PatchedUser {
 
 export interface CreateUser {
   username: string;
-  password: string;
   first_name?: string;
   last_name?: string;
+  password: string;
   is_active: boolean;
-  is_superuser: boolean;
 }
 export interface UpdateUser {
   username: string;
   password: string;
-  first_name?: string;
-  last_name?: string;
+  first_name?: string | null;
+  last_name?: string | null;
   is_active: boolean;
 }
