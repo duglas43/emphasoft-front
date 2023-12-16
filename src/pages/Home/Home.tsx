@@ -9,17 +9,22 @@ import {
 import { SIDEBAR_SCHEMA } from "@src/components/Sidebar";
 import { Box, Grid, Stack, Drawer, Toolbar } from "@mui/material";
 import { pageContainerSx, containerSx, pageItemSx } from "@src/styles/global";
-import { Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { temporaryDrawerSx, permanentDrawerSx, mainSx } from "./styles";
 
 export const HomePage: FC = () => {
   const [mobileOpen, setMobileOpen] = React.useState(false);
+  const navigate = useNavigate();
+
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
-  if (!localStorage.getItem("token")) {
-    return <Navigate to="/signin" />;
-  }
+  React.useEffect(() => {
+    if (!localStorage.getItem("token")) {
+      navigate("/signin");
+    }
+  }, [navigate]);
+
   return (
     <>
       <Box sx={{ display: "flex", alignSelf: "stretch", height: "100%" }}>
@@ -27,7 +32,13 @@ export const HomePage: FC = () => {
           onDrawerToggle={() => {
             handleDrawerToggle();
           }}
-          text={"Users"}
+          title={"Users"}
+          onLogout={() => {
+            localStorage.removeItem("token");
+            localStorage.removeItem("username");
+            window.location.reload();
+          }}
+          userName={localStorage.getItem("username") || ""}
         />
         <Box
           component="nav"

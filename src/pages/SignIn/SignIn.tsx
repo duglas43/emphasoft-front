@@ -14,6 +14,7 @@ export const SignInPage: FC = () => {
   const handleSubmit = async (values: SignIn) => {
     const { token } = await signIn(values).unwrap();
     localStorage.setItem("token", token);
+    localStorage.setItem("username", values.username);
     navigate("/");
   };
   React.useEffect(() => {

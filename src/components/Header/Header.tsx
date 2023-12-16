@@ -1,21 +1,43 @@
-import { FC } from "react";
-import { AppBar, Toolbar, AppBarProps, Box } from "@mui/material";
-import { IconButton, Typography } from "@mui/material/";
+import React, { FC } from "react";
+import {
+  AppBar,
+  Toolbar,
+  AppBarProps,
+  Box,
+  IconButton,
+  Button,
+  Typography,
+  Avatar,
+  Menu,
+  MenuList,
+  ListItemIcon,
+  ListItemText,
+  MenuItem,
+  Stack,
+} from "@mui/material";
+
 import MenuIcon from "@mui/icons-material/Menu";
 import LogoutIcon from "@mui/icons-material/Logout";
 
 export interface HeaderProps extends AppBarProps {
   onDrawerToggle: () => void;
-  text: string;
+  title: string;
+  onLogout: () => void;
+  userName: string;
 }
 export const Header: FC<HeaderProps> = ({
   onDrawerToggle,
-  text,
+  title,
+  onLogout,
+  userName,
   ...appBarProps
 }) => {
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    window.location.reload();
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
   };
   return (
     <AppBar
@@ -49,18 +71,36 @@ export const Header: FC<HeaderProps> = ({
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div">
-            {text}
+            {title}
           </Typography>
         </Box>
-        <IconButton
-          color="inherit"
-          aria-label="logut"
-          edge="end"
-          onClick={handleLogout}
-        >
-          <LogoutIcon />
-        </IconButton>
+
+        <Stack direction="row" spacing={1} alignItems="center">
+          <Button
+            variant="text"
+            sx={{ color: "white" }}
+            onClick={handleClick}
+            endIcon={<Avatar />}
+          >
+            {localStorage.getItem("username")}
+          </Button>
+        </Stack>
       </Toolbar>
+
+      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
+        <MenuList>
+          <MenuItem
+            onClick={() => {
+              onLogout();
+            }}
+          >
+            <ListItemIcon>
+              <LogoutIcon />
+            </ListItemIcon>
+            <ListItemText>Logout</ListItemText>
+          </MenuItem>
+        </MenuList>
+      </Menu>
     </AppBar>
   );
 };
