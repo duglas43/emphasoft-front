@@ -34,14 +34,12 @@ export const UsersTable: FC<UsersTableProps> = (props) => {
   const handleRowSelectionModelChange = (
     newSelectionModel: GridRowSelectionModel
   ) => {
-    console.log(newSelectionModel);
     if (Array.isArray(newSelectionModel)) {
       const newSelectionModelIds = newSelectionModel.map((id) => Number(id));
       dispatch(setSelectedIds(newSelectionModelIds));
     } else {
       dispatch(setSelectedIds([Number(newSelectionModel)]));
     }
-    console.log(rowSelectionModel);
   };
 
   return (
