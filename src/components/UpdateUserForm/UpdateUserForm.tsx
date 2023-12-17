@@ -1,6 +1,9 @@
 import React, { FC } from "react";
 import { useFormik } from "formik";
 import { UpdateUser, User } from "@src/@types";
+import { ApiError } from "@src/axios";
+import { FormikHelpers } from "formik";
+import { AxiosError } from "axios";
 import * as yup from "yup";
 import {
   TextField,
@@ -13,7 +16,7 @@ import { updateUserFormSx } from "./styles";
 
 export interface UpdateUserFormProps {
   initialValues: User;
-  onSubmit: (values: Partial<UpdateUser>) => void;
+  onSubmit: (values: UpdateUser) => Promise<User | ApiError | null>;
 }
 
 export const UpdateUserForm: FC<UpdateUserFormProps> = ({
@@ -23,6 +26,7 @@ export const UpdateUserForm: FC<UpdateUserFormProps> = ({
   const validationSchema = yup.object().shape({
     username: yup
       .string()
+      .required("Username is required")
       .matches(
         /^[\w.@+-]+$/,
         "Username can only contain alphanumeric characters or . @ + - _"
@@ -36,6 +40,7 @@ export const UpdateUserForm: FC<UpdateUserFormProps> = ({
       .max(150, "Last name cannot be longer than 150 characters"),
     password: yup
       .string()
+      .required("Password is required")
       .matches(
         /^(?=.*[A-Z])(?=.*\d).{8,}$/,
         "Password must contain at least 8 characters, 1 uppercase letter and 1 number"
@@ -43,21 +48,37 @@ export const UpdateUserForm: FC<UpdateUserFormProps> = ({
       .max(128, "Password cannot be longer than 128 characters"),
     is_active: yup.boolean(),
   });
-  const formikInitialValues: Partial<UpdateUser> = {
+  const formikInitialValues: UpdateUser = {
     username: initialValues.username,
-    first_name: initialValues.first_name,
-    last_name: initialValues.last_name,
-    password: undefined,
+    first_name: initialValues.first_name || "",
+    last_name: initialValues.last_name || "",
+    password: "",
     is_active: initialValues.is_active,
+  };
+
+  const handleSubmit = async (
+    values: UpdateUser,
+    { setFieldError }: FormikHelpers<UpdateUser>
+  ) => {
+    try {
+      await onSubmit(values);
+      formik.resetForm();
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        const response = error.response;
+        if (!response?.data) return;
+        Object.keys(response.data).forEach((key) => {
+          setFieldError(key, response.data[key]?.join(", "));
+        });
+      }
+    }
   };
 
   const formik = useFormik({
     initialValues: formikInitialValues,
     validationSchema,
     enableReinitialize: true,
-    onSubmit: (values) => {
-      onSubmit(values);
-    },
+    onSubmit: handleSubmit,
   });
   return (
     <Box component="form" sx={updateUserFormSx} onSubmit={formik.handleSubmit}>

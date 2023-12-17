@@ -1,7 +1,7 @@
 import React, { FC } from "react";
 import { Box, Typography, BoxProps } from "@mui/material";
 import { UpdateUserForm, UpdateUserFormPlaceholder } from "../";
-import { usePatchUserMutation, useGetUserQuery } from "@src/store/api/api";
+import { useUpdateUserMutation, useGetUserQuery } from "@src/store/api/api";
 import { useAppSelector } from "@src/hooks";
 import { selectUsersTableSelectedIds } from "@src/store/slices";
 import { skipToken } from "@reduxjs/toolkit/query";
@@ -11,15 +11,15 @@ export interface UpdateUserContainerProps extends BoxProps {}
 export const UpdateUserContainer: FC<UpdateUserContainerProps> = ({
   ...boxProps
 }) => {
-  const [updateUser] = usePatchUserMutation();
+  const [updateUser] = useUpdateUserMutation();
   const selectedIds = useAppSelector(selectUsersTableSelectedIds);
   const { currentData: selectedUser } = useGetUserQuery(
     selectedIds[0] || skipToken
   );
 
-  const handleSubmit = async (values: Partial<UpdateUser>) => {
-    if (!selectedIds[0]) return;
-    await updateUser({ id: selectedIds[0], data: values });
+  const handleSubmit = async (values: UpdateUser) => {
+    if (!selectedIds[0]) return null;
+    return updateUser({ id: selectedIds[0], data: values }).unwrap();
   };
   return (
     <Box {...boxProps}>
