@@ -38,6 +38,10 @@ axiosInstance.interceptors.request.use((config) => useBearerHeader(config));
 //   useRefreshToken(error)
 // );
 
+export interface IError {
+  [key: string]: string | string[];
+}
+export type ApiError = AxiosError<IError>;
 export const axiosBaseQuery =
   ({
     baseQuery,
@@ -53,29 +57,12 @@ export const axiosBaseQuery =
     unknown,
     unknown
   > =>
-  async ({ url, method, data, params, ...other }) => {
+  async ({ url, ...other }) => {
     try {
-      const result = await axiosInstance({
-        url: baseQuery + url,
-        method,
-        data,
-        params,
-        ...other,
-      });
+      const result = await axiosInstance({ url: baseQuery + url, ...other });
       return { ...result, meta: result };
     } catch (axiosError) {
-      let err = axiosError as AxiosError<{
-        message: string;
-        messageT?: string;
-        errors: string[];
-      }>;
-      return {
-        error: {
-          status: err.response?.status,
-          message: err.response?.data?.message,
-          messageT: err.response?.data?.messageT,
-          errors: err.response?.data?.errors,
-        },
-      };
+      const error = axiosError as ApiError;
+      return { error };
     }
   };

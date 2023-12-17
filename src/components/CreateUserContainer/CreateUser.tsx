@@ -9,9 +9,7 @@ export const CreateUserContainer: FC<CreateUserContainerProps> = ({
   ...boxProps
 }) => {
   const [createUser] = useCreateUserMutation();
-  const handleSubmit = async (values: CreateUser) => {
-    await createUser(values).unwrap();
-  };
+  const handleSubmit = (values: CreateUser) => createUser(values).unwrap();
   return (
     <Box {...boxProps}>
       <Typography variant="h6" component="h1">

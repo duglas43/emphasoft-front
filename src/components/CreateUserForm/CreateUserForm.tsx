@@ -1,6 +1,9 @@
 import React, { FC } from "react";
-import { useFormik } from "formik";
-import { CreateUser } from "@src/@types";
+import { useFormik, FormikHelpers } from "formik";
+import { CreateUser, User } from "@src/@types";
+import { ApiError } from "@src/axios";
+import { AxiosError } from "axios";
+import { createUserFormSx } from "./styles";
 import * as yup from "yup";
 import {
   TextField,
@@ -9,10 +12,9 @@ import {
   Checkbox,
   FormControlLabel,
 } from "@mui/material";
-import { createUserFormSx } from "./styles";
 
 export interface CreateUserFormProps {
-  onSubmit: (values: CreateUser) => void;
+  onSubmit: (values: CreateUser) => Promise<User | ApiError>;
 }
 
 export const CreateUserForm: FC<CreateUserFormProps> = ({ onSubmit }) => {
@@ -48,14 +50,28 @@ export const CreateUserForm: FC<CreateUserFormProps> = ({ onSubmit }) => {
     password: "",
     is_active: true,
   };
+  const handleSubmit = async (
+    values: CreateUser,
+    { setFieldError }: FormikHelpers<CreateUser>
+  ) => {
+    try {
+      await onSubmit(values);
+      formik.resetForm();
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        const response = error.response;
+        if (!response?.data) return;
+        Object.keys(response.data).forEach((key) => {
+          setFieldError(key, response.data[key]?.join(", "));
+        });
+      }
+    }
+  };
 
   const formik = useFormik({
     initialValues,
     validationSchema,
-    onSubmit: (values) => {
-      onSubmit(values);
-      formik.resetForm();
-    },
+    onSubmit: handleSubmit,
   });
   return (
     <Box component="form" sx={createUserFormSx} onSubmit={formik.handleSubmit}>
