@@ -6,24 +6,22 @@ import {
   Header,
   Sidebar,
 } from "@src/components";
+
 import { SIDEBAR_SCHEMA } from "@src/components/Sidebar";
 import { Box, Grid, Stack, Drawer, Toolbar } from "@mui/material";
 import { pageContainerSx, containerSx, pageItemSx } from "@src/styles/global";
-import { useNavigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { temporaryDrawerSx, permanentDrawerSx, mainSx } from "./styles";
 
 export const HomePage: FC = () => {
   const [mobileOpen, setMobileOpen] = React.useState(false);
-  const navigate = useNavigate();
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
-  React.useEffect(() => {
-    if (!localStorage.getItem("token")) {
-      navigate("/signin");
-    }
-  }, [navigate]);
+  if (!localStorage.getItem("token")) {
+    return <Navigate to="/login" />;
+  }
 
   return (
     <>
