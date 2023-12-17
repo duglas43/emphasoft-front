@@ -20,7 +20,7 @@ export const HomePage: FC = () => {
     setMobileOpen(!mobileOpen);
   };
   if (!localStorage.getItem("token")) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/signin" />;
   }
 
   return (
